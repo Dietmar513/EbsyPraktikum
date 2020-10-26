@@ -24,9 +24,13 @@ else if (i == 1) {
 }
 */
 
-static uint32_t led1_wert = 0x100;
-static uint32_t led2_wert
-
+static uint32_t led1_value = 0x100;
+static uint32_t led2_value = 0x1000;
+static uint32_t led1_trigger = 0;
+static uint32_t led2_trigger = 0;
+static uint32_t led1_freq = 3;
+static uint32_t led2_freq = 1;
+static uint32_t tickcounter = 0;
 
 void init(void) {
 	LPC_GPIO0->DIR = 0xFFFFFFFF;
@@ -41,70 +45,50 @@ void blinkLED(int LEDmask) {
 }
 
 void led1(void) {
-	if (led1_wert == 0x800) {
-		blinkLED(led1_wert >> 1);
+
+	if (led1_trigger == 0) {
+		led1_value << 1;
+		if (led1_value == 0x800) {
+			led1_trigger = 1;
+		}
+		else 
+		{
+			//purposely left empty
+		}
+	else if (led1_trigger == 1) {
+		led1_value >> 1;
+		if (led1_value == 0x100) {
+			led1_trigger = 0;
+		}
 	}
-	if (led1_wert == 0x400) {
-		blinkLED(led1_wert >> 1);
-	}
-	if (led1_wert == 0x200)
-	else {
-		blinkLED(led1_wert << 1);
 	}
 }
 
-/*
-LPC_GPIO0->SET = 0x100;
-delayms(100);
-LPC_GPIO0->CLR = 0x100;
-delayms(100);
-LPC_GPIO0->SET = 0x200;
-delayms(100);
-LPC_GPIO0->CLR = 0x200;
-delayms(100);
-LPC_GPIO0->SET = 0x400;
-delayms(100);
-LPC_GPIO0->CLR = 0x400;
-delayms(100);
-LPC_GPIO0->SET = 0x800;
-delayms(100);
-LPC_GPIO0->CLR = 0x800;
-delayms(100);
-LPC_GPIO0->SET = 0x400;
-delayms(100);
-LPC_GPIO0->CLR = 0x400;
-delayms(100);
-LPC_GPIO0->SET = 0x200;
-delayms(100);
-LPC_GPIO0->CLR = 0x200;
-*/
+
 }
 
 void led2(void) {
 
-	LPC_GPIO0->SET = 0x1000;
-	delayms(100);
-	LPC_GPIO0->CLR = 0x1000;
-	delayms(100);
-	LPC_GPIO0->SET = 0x2000;
-	delayms(100);
-	LPC_GPIO0->CLR = 0x2000;
-	delayms(100);
-	LPC_GPIO0->SET = 0x4000;
-	delayms(100);
-	LPC_GPIO0->CLR = 0x4000;
-	delayms(100);
-	LPC_GPIO0->SET = 0x8000;
-	delayms(100);
-	LPC_GPIO0->CLR = 0x8000;
-	delayms(100);
-	LPC_GPIO0->SET = 0x4000;
-	delayms(100);
-	LPC_GPIO0->CLR = 0x4000;
-	delayms(100);
-	LPC_GPIO0->SET = 0x2000;
-	delayms(100);
-	LPC_GPIO0->CLR = 0x2000;
+	if (led2_trigger == 0)
+	{
+		led2_value << 1;
+		if (led2_value == 0x8000)
+		{
+			led2_trigger = 1;
+		}
+		else 
+		{
+			//purposely left empty
+		}
+	}
+	else if (led2_trigger == 1) 
+	{
+		led2_value >> 1;
+		if (led2_value == 0x1000) 
+		{
+			led2_trigger = 0;
+		}
+	}
 }
 
 int main(void)
@@ -112,9 +96,37 @@ int main(void)
 	init();
 	while (1)
 	{
-		led1();
-		led2();
-		blinkLED(
+		if (led1_freq > led2_freq)
+		{
+
+			if (tickcounter % led1_freq == 0)
+			{
+				blinkLED(led1_value | led2_value);
+				led1();
+				led2();
+			}
+			else if (tickcounter % led2_freq == 0)
+			{
+				blinkLED(led2_value);
+				led2();
+			}
+			tickcounter++;
+		}
+		else
+		{
+			if (tickcounter % led2_freq == 0)
+			{
+				blinkLED(led1_value | led2_value);
+				led1();
+				led2();
+			}
+			else if (tickcounter % led1_freq == 0)
+			{
+				blinkLED(led1_value);
+				led1();
+			}
+			tickcounter++;
+		}
 	}
 }
 
