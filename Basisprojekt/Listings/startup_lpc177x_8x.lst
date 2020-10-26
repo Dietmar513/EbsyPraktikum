@@ -459,7 +459,7 @@ C:\Keil_v5\ARM\RV31\INC -IC:\Keil_v5\ARM\CMSIS\Include -IC:\Keil_v5\ARM\INC\NXP
 ARM Macro Assembler    Page 8 
 
 
-\LPC177x_8x --predefine="__UVISION_VERSION SETA 525" --list=.\listings\startup_
+\LPC177x_8x --predefine="__UVISION_VERSION SETA 529" --list=.\listings\startup_
 lpc177x_8x.lst startup_LPC177x_8x.s
 
 
