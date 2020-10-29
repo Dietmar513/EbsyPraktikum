@@ -3,19 +3,11 @@
 #include "delay.h"
 
 
-//	LPC_GPIO0->SET = 0xAA00;
+uint32_t tickcounter = 0;
 
-
-
-
-static uint32_t led1_value = 0x100;
-static uint32_t led2_value = 0x1000;
-static uint32_t led1_trigger = 0;
-static uint32_t led2_trigger = 0;
-static uint32_t led1_freq = 1;
-static uint32_t led2_freq = 6;
-static uint32_t tickcounter = 0;
-static uint32_t delay = 300;
+#define led1_freq 1;
+#define led2_freq 6;
+#define delay 300;	//delay in ms
 
 void init(void) 
 {
@@ -25,48 +17,64 @@ void init(void)
 
 void led1(void) 
 {
-	LPC_GPIO0->CLR = led1_value;
-	if (led1_trigger == 0) 
+	static uint32_t led_value;
+	static uint32_t led_trigger;	//toggles led direction
+	if(tickcounter == 0)			//Initialize values
 	{
-		led1_value = led1_value << 1;
-		if (led1_value == 0x800) 
+		led_value = 0x100;
+		led_trigger = 0;
+	}
+
+	LPC_GPIO0->CLR = led_value;
+	if (led_trigger == 0) 
+	{
+		led_value = led_value << 1;
+		if (led_value == 0x800) 
 		{
-			led1_trigger = 1;
+			led_trigger = 1;
 		}
 	}
-	else if (led1_trigger == 1) 
+	else if (led_trigger == 1) 
 	{
-		led1_value = led1_value >> 1;
-		if (led1_value == 0x100) 
+		led_value = led_value >> 1;
+		if (led_value == 0x100) 
 		{
-			led1_trigger = 0;
+			led_trigger = 0;
 		}
 	}
-	LPC_GPIO0->SET = led1_value;
+	LPC_GPIO0->SET = led_value;
 }
 
 
 
 void led2(void) 
 {
-	LPC_GPIO0->CLR = led2_value;
-	if (led2_trigger == 0)
+	static uint32_t led_value;
+	static uint32_t led_trigger;	//toggles led direction
+	if (tickcounter == 0) 			//Initialize values
 	{
-		led2_value = led2_value << 1;
-		if (led2_value == 0x8000)
+		led_value = 0x1000;
+		led_trigger = 0;
+	}
+
+	LPC_GPIO0->CLR = led_value;
+	if (led_trigger == 0)
+	{
+		led_value = led_value << 1;
+		if (led_value == 0x8000)
 		{
-			led2_trigger = 1;
+			led_trigger = 1;
 		}
 	}
-	else if (led2_trigger == 1) 
+	else if (led_trigger == 1) 
 	{
-		led2_value = led2_value >> 1;
-		if (led2_value == 0x1000) 
+		led_value = led_value >> 1;
+		if (led_value == 0x1000) 
 		{
-			led2_trigger = 0;
+			led_trigger = 0;
 		}
 	}
-	LPC_GPIO0->SET = led2_value;
+	LPC_GPIO0->SET = led_value;
 }
 
 int main(void)
